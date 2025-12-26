@@ -12,6 +12,7 @@ const ProductManagement = () => {
     category: "",
     countInStock: "",
     image: "",
+    images: ["", "", "", "", ""],
     description: "",
     isTrending: false,
   });
@@ -42,12 +43,22 @@ const ProductManagement = () => {
   };
 
   const handleEdit = (product) => {
+    // Ensure we have 5 image slots, padding with empty strings if necessary
+    let initialImages =
+      product.images && product.images.length > 0
+        ? [...product.images]
+        : [product.image];
+    while (initialImages.length < 5) {
+      initialImages.push("");
+    }
+
     setFormData({
       name: product.name,
       price: product.price,
       category: product.category,
       countInStock: product.countInStock,
       image: product.image,
+      images: initialImages,
       description: product.description,
       isTrending: product.isTrending,
     });
@@ -74,6 +85,17 @@ const ProductManagement = () => {
     setFormData({ ...formData, [e.target.name]: value });
   };
 
+  const handleImageChange = (index, value) => {
+    const newImages = [...formData.images];
+    newImages[index] = value;
+    // Sync the first image with the main 'image' field for backward compatibility
+    setFormData({
+      ...formData,
+      images: newImages,
+      image: index === 0 ? value : formData.image,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -97,6 +119,7 @@ const ProductManagement = () => {
           category: "",
           countInStock: "",
           image: "",
+          images: ["", "", "", "", ""],
           description: "",
           isTrending: false,
         });
@@ -120,6 +143,7 @@ const ProductManagement = () => {
               category: "",
               countInStock: "",
               image: "",
+              images: ["", "", "", "", ""],
               description: "",
               isTrending: false,
             });
@@ -305,17 +329,21 @@ const ProductManagement = () => {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL
+                  Product Images (5 URLs)
                 </label>
-                <input
-                  type="text"
-                  name="image"
-                  value={formData.image}
-                  onChange={handleInputChange}
-                  className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  required
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="space-y-3">
+                  {formData.images.map((img, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      value={img}
+                      onChange={(e) => handleImageChange(index, e.target.value)}
+                      className="block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                      placeholder={`Image URL ${index + 1}`}
+                      required={index === 0}
+                    />
+                  ))}
+                </div>
               </div>
 
               <div>

@@ -3,7 +3,6 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const authRoutes = require("./routes/authRoutes");
-const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const categoryRoutes = require("./routes/categoryRoutes");
 const userRoutes = require("./routes/userRoutes");
@@ -13,6 +12,7 @@ const dashboardRoutes = require("./routes/dashboardRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const addressRoutes = require("./routes/addressRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 dotenv.config();
 
@@ -36,7 +36,6 @@ mongoose
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/users", userRoutes);
@@ -45,6 +44,8 @@ app.use("/api/coupons", couponRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/addresses", addressRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

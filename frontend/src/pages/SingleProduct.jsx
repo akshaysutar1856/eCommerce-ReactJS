@@ -6,6 +6,8 @@ const SingleProduct = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [selectedImage, setSelectedImage] = useState("");
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -13,6 +15,8 @@ const SingleProduct = () => {
         const res = await fetch(`http://localhost:5000/api/products/${id}`);
         const data = await res.json();
         setProduct(data);
+        setSelectedImage(data.image);
+        setSelectedImageIndex(0);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching product:", error);
@@ -50,17 +54,52 @@ const SingleProduct = () => {
   if (!product)
     return <div className="text-center py-20">Product not found</div>;
 
+  // Process images: use product.images if available, filter empty strings, and remove duplicates
+  let images =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
+  images = images.filter((img) => img && img.trim() !== "");
+  // Deduplicate images to clean up display
+  images = [...new Set(images)];
+
+  if (images.length === 0) images = [product.image];
+
   return (
     <div className="bg-white min-h-screen py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-          {/* Image */}
-          <div className="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="w-full h-full object-cover object-center"
-            />
+          {/* Image Gallery */}
+          <div className="flex flex-col">
+            <div className="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden mb-4 h-96">
+              <img
+                src={selectedImage || product.image}
+                alt={product.name}
+                className="w-full h-full object-cover object-center"
+              />
+            </div>
+            <div className="grid grid-cols-5 gap-4">
+              {images.map((img, index) => (
+                <div
+                  key={index}
+                  className={`aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden cursor-pointer border-2 h-24 ${
+                    selectedImageIndex === index
+                      ? "border-indigo-600"
+                      : "border-transparent"
+                  }`}
+                  onClick={() => {
+                    setSelectedImage(img);
+                    setSelectedImageIndex(index);
+                  }}
+                >
+                  <img
+                    src={img}
+                    alt={`Product ${index}`}
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
           {/* Details */}
           <div>
