@@ -12,6 +12,7 @@ const couponRoutes = require("./routes/couponRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const bannerRoutes = require("./routes/bannerRoutes");
 const addressRoutes = require("./routes/addressRoutes");
+const analyticsRoutes = require("./routes/analyticsRoutes");
 
 dotenv.config();
 
