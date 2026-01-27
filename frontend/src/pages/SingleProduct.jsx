@@ -8,6 +8,7 @@ const SingleProduct = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -35,15 +36,18 @@ const SingleProduct = () => {
       return;
     } else {
       try {
-        const res = await fetch("http://localhost:5000/api/cart", {
+        const res = await fetch("http://localhost:5000/api/users/cart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${userInfo.token}`,
           },
-          body: JSON.stringify({ productId: product._id, quantity: 1 }),
+          body: JSON.stringify({ productId: product._id, quantity: qty }),
         });
-        if (res.ok) alert(`Added ${product.name} to cart!`);
+        if (res.ok) {
+          alert(`Added ${product.name} to cart!`);
+          navigate("/cart");
+        }
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
@@ -71,18 +75,18 @@ const SingleProduct = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
           {/* Image Gallery */}
           <div className="flex flex-col">
-            <div className="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden mb-4 h-96">
+            <div className="w-full bg-gray-200 rounded-lg overflow-hidden mb-4 h-96">
               <img
                 src={selectedImage || product.image}
                 alt={product.name}
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-contain object-center"
               />
             </div>
-            <div className="grid grid-cols-5 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-5 gap-4">
               {images.map((img, index) => (
                 <div
                   key={index}
-                  className={`aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden cursor-pointer border-2 h-24 ${
+                  className={`w-full bg-gray-200 rounded-lg overflow-hidden cursor-pointer border-2 h-24 ${
                     selectedImageIndex === index
                       ? "border-indigo-600"
                       : "border-transparent"
@@ -95,7 +99,7 @@ const SingleProduct = () => {
                   <img
                     src={img}
                     alt={`Product ${index}`}
-                    className="w-full h-full object-cover object-center"
+                    className="w-full h-full object-contain object-center"
                   />
                 </div>
               ))}
@@ -117,6 +121,22 @@ const SingleProduct = () => {
               <p className="text-sm text-gray-500">
                 Stock: {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
               </p>
+              {product.countInStock > 0 && (
+                <div className="flex items-center mt-4">
+                  <span className="mr-3">Quantity</span>
+                  <select
+                    value={qty}
+                    onChange={(e) => setQty(Number(e.target.value))}
+                    className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-base pl-3 pr-10"
+                  >
+                    {[...Array(product.countInStock).keys()].map((x) => (
+                      <option key={x + 1} value={x + 1}>
+                        {x + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             <div className="mt-8">
               <button

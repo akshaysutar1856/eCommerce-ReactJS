@@ -13,7 +13,7 @@ const Checkout = () => {
   const [savedAddresses, setSavedAddresses] = useState([]);
   const [selectedAddressId, setSelectedAddressId] = useState("new");
   const [cartItems, setCartItems] = useState(
-    JSON.parse(localStorage.getItem("cartItems")) || []
+    JSON.parse(localStorage.getItem("cartItems")) || [],
   );
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -42,7 +42,7 @@ const Checkout = () => {
 
       const fetchCart = async () => {
         try {
-          const res = await fetch("http://localhost:5000/api/cart", {
+          const res = await fetch("http://localhost:5000/api/users/cart", {
             headers: {
               Authorization: `Bearer ${userInfo.token}`,
             },
@@ -77,10 +77,13 @@ const Checkout = () => {
   };
 
   const itemsPrice = addDecimals(
-    cartItems.reduce((acc, item) => acc + item.price * item.qty, 0)
+    cartItems.reduce(
+      (acc, item) => acc + item.price * (item.quantity || item.qty || 1),
+      0,
+    ),
   );
   const shippingPrice = addDecimals(
-    Number(itemsPrice) > 100 || cartItems.length === 0 ? 0 : 10
+    Number(itemsPrice) > 100 || cartItems.length === 0 ? 0 : 10,
   );
   const taxPrice = addDecimals(Number((0.15 * itemsPrice).toFixed(2)));
   const totalPrice = (
@@ -105,7 +108,13 @@ const Checkout = () => {
           Authorization: `Bearer ${userInfo.token}`,
         },
         body: JSON.stringify({
-          orderItems: cartItems,
+          orderItems: cartItems.map((item) => ({
+            name: item.name,
+            qty: item.quantity || item.qty,
+            image: item.image,
+            price: item.price,
+            product: item.product._id || item.product,
+          })),
           shippingAddress,
           paymentMethod,
           itemsPrice,
@@ -385,7 +394,9 @@ const Checkout = () => {
                             </div>
                           </div>
                           <div className="flex flex-1 items-end justify-between text-sm">
-                            <p className="text-gray-500">Qty {item.qty}</p>
+                            <p className="text-gray-500">
+                              Qty {item.quantity || item.qty}
+                            </p>
                           </div>
                         </div>
                       </li>

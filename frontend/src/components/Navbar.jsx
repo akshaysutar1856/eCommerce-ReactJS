@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-const Navbar = () => {
+const Navbar = ({ toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -15,13 +15,35 @@ const Navbar = () => {
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
-            <Link
-              to="/"
-              className="text-2xl font-bold text-indigo-600 tracking-tight hover:text-indigo-500 transition duration-300"
-            >
-              Ecommerce
-            </Link>
+          <div className="flex items-center">
+            {toggleSidebar && (
+              <button
+                onClick={toggleSidebar}
+                className="mr-4 text-gray-600 hover:text-gray-900 focus:outline-none"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              </button>
+            )}
+            <div className="flex-shrink-0">
+              <Link
+                to="/"
+                className="text-2xl font-bold text-indigo-600 tracking-tight hover:text-indigo-500 transition duration-300"
+              >
+                Ecommerce
+              </Link>
+            </div>
           </div>
           <nav>
             <ul className="flex items-center space-x-8">

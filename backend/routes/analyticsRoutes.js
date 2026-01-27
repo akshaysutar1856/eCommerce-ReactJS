@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const { getAnalytics } = require("../controllers/analyticsController");
+const { protect, admin } = require("../middleware/authMiddleware");
 
-// Placeholder for analytics routes
-router.get("/", (req, res) => {
-  res.status(200).json({ message: "Analytics routes are working" });
-});
+router.get("/", protect, admin, getAnalytics);
 
 module.exports = router;

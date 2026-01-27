@@ -6,6 +6,7 @@ const couponSchema = new mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      uppercase: true,
     },
     discount: {
       type: Number,
@@ -13,12 +14,17 @@ const couponSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["Percentage", "Fixed Amount"],
       required: true,
+      enum: ["Percentage", "Fixed Amount"],
     },
-    status: { type: String, default: "Active" },
+    status: {
+      type: String,
+      required: true,
+      default: "Active",
+      enum: ["Active", "Expired"],
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Coupon", couponSchema);

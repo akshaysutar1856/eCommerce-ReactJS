@@ -24,7 +24,7 @@ const Home = () => {
         const res = await fetch("http://localhost:5000/api/banners");
         const data = await res.json();
         const activeBanners = data.filter(
-          (banner) => banner.status === "Active"
+          (banner) => banner.status === "Active",
         );
         setBanners(activeBanners);
       } catch (error) {
@@ -62,7 +62,7 @@ const Home = () => {
       return;
     } else {
       try {
-        const res = await fetch("http://localhost:5000/api/cart", {
+        const res = await fetch("http://localhost:5000/api/users/cart", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -111,7 +111,7 @@ const Home = () => {
       </div>
 
       {/* 2. Hero Section */}
-      <div className="relative bg-gray-100">
+      <div className="relative bg-gray-100 h-[500px] sm:h-[600px] lg:h-[700px]">
         <div className="absolute inset-0">
           <img
             className="w-full h-full object-cover"
@@ -124,15 +124,15 @@ const Home = () => {
           />
           <div className="absolute inset-0 bg-gray-900 opacity-40"></div>
         </div>
-        <div className="relative max-w-7xl mx-auto py-24 px-4 sm:py-32 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
+        <div className="relative max-w-7xl mx-auto h-full flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white">
             Sustainable Style for Every Body
           </h1>
-          <p className="mt-6 text-xl text-gray-200 max-w-3xl mx-auto">
+          <p className="mt-4 sm:mt-6 text-lg sm:text-xl text-gray-200 max-w-3xl mx-auto">
             Discover our new collection of eco-friendly apparel designed for
             comfort and durability.
           </p>
-          <div className="mt-10">
+          <div className="mt-8 sm:mt-10">
             <a
               href="#trending"
               className="inline-block bg-white border border-transparent rounded-md py-3 px-8 text-base font-medium text-indigo-600 hover:bg-gray-50 md:text-lg transition duration-300 shadow-lg"
@@ -144,24 +144,24 @@ const Home = () => {
       </div>
 
       {/* 3. Product Discovery - Category Clusters */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-8 text-center">
           Shop by Category
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8">
           {categories.map((cat) => (
             <div
               key={cat._id}
               className="group flex flex-col items-center cursor-pointer"
             >
-              <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-transparent group-hover:border-indigo-600 transition duration-300">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-transparent group-hover:border-indigo-600 transition duration-300">
                 <img
                   src={cat.image}
                   alt={cat.name}
                   className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
                 />
               </div>
-              <span className="mt-4 text-lg font-medium text-gray-700 group-hover:text-indigo-600">
+              <span className="mt-3 sm:mt-4 text-base sm:text-lg font-medium text-gray-700 group-hover:text-indigo-600 text-center">
                 {cat.name}
               </span>
             </div>
@@ -170,10 +170,10 @@ const Home = () => {
       </div>
 
       {/* 4. Trending / New Arrivals */}
-      <div id="trending" className="bg-gray-50 py-16">
+      <div id="trending" className="bg-gray-50 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-end mb-8">
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900">
               Featured Products
             </h2>
             <Link
@@ -183,7 +183,7 @@ const Home = () => {
               View All &rarr;
             </Link>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {products.length > 0 ? (
               products.map((product) => (
                 <div
@@ -232,11 +232,11 @@ const Home = () => {
       </div>
 
       {/* 5. Personalized Feeds (Mock) */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-6">
           Recommended for You
         </h2>
-        <div className="bg-indigo-50 rounded-xl p-8 flex flex-col md:flex-row items-center justify-between">
+        <div className="bg-indigo-50 rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between text-center md:text-left">
           <div className="mb-6 md:mb-0">
             <h3 className="text-xl font-bold text-indigo-900">
               Complete Your Look
@@ -253,10 +253,10 @@ const Home = () => {
       </div>
 
       {/* 6. Trust & Social Proof */}
-      <div className="bg-white py-16 border-t border-gray-200">
+      <div className="bg-white py-12 sm:py-16 border-t border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Trust Badges */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-16">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center mb-12 sm:mb-16">
             <div className="flex flex-col items-center">
               <div className="bg-green-100 p-4 rounded-full mb-4">
                 <svg
@@ -321,7 +321,7 @@ const Home = () => {
           </div>
 
           {/* Customer Reviews */}
-          <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-8 text-center">
             What Our Customers Say
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -351,7 +351,7 @@ const Home = () => {
       </div>
 
       {/* 7. Footer */}
-      <footer className="bg-gray-900 text-white pt-16 pb-8">
+      <footer className="bg-gray-900 text-white pt-12 sm:pt-16 pb-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
             {/* Newsletter */}

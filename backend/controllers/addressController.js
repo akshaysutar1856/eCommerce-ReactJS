@@ -1,6 +1,6 @@
 const Address = require("../models/Address");
 
-// @desc    Get user addresses
+// @desc    Get all addresses for a user
 // @route   GET /api/addresses
 // @access  Private
 const getAddresses = async (req, res) => {
@@ -12,7 +12,7 @@ const getAddresses = async (req, res) => {
   }
 };
 
-// @desc    Add new address
+// @desc    Create a new address
 // @route   POST /api/addresses
 // @access  Private
 const addAddress = async (req, res) => {
@@ -21,7 +21,10 @@ const addAddress = async (req, res) => {
 
   try {
     if (isDefault) {
-      await Address.updateMany({ user: req.user._id }, { isDefault: false });
+      await Address.updateMany(
+        { user: req.user._id },
+        { $set: { isDefault: false } },
+      );
     }
 
     const address = new Address({
@@ -39,11 +42,11 @@ const addAddress = async (req, res) => {
     const createdAddress = await address.save();
     res.status(201).json(createdAddress);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Update address
+// @desc    Update an address
 // @route   PUT /api/addresses/:id
 // @access  Private
 const updateAddress = async (req, res) => {
@@ -59,7 +62,10 @@ const updateAddress = async (req, res) => {
       }
 
       if (isDefault) {
-        await Address.updateMany({ user: req.user._id }, { isDefault: false });
+        await Address.updateMany(
+          { user: req.user._id },
+          { $set: { isDefault: false } },
+        );
       }
 
       address.name = name || address.name;
@@ -78,11 +84,11 @@ const updateAddress = async (req, res) => {
       res.status(404).json({ message: "Address not found" });
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Delete address
+// @desc    Delete an address
 // @route   DELETE /api/addresses/:id
 // @access  Private
 const deleteAddress = async (req, res) => {
@@ -103,9 +109,4 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-module.exports = {
-  getAddresses,
-  addAddress,
-  updateAddress,
-  deleteAddress,
-};
+module.exports = { getAddresses, addAddress, updateAddress, deleteAddress };

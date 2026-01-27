@@ -18,7 +18,7 @@ const Cart = () => {
 
   const fetchCart = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/cart", {
+      const res = await fetch("http://localhost:5000/api/users/cart", {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },
@@ -43,14 +43,17 @@ const Cart = () => {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:5000/api/cart/${productId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
+      const res = await fetch(
+        `http://localhost:5000/api/users/cart/${productId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+          body: JSON.stringify({ quantity: newQuantity }),
         },
-        body: JSON.stringify({ quantity: newQuantity }),
-      });
+      );
       const data = await res.json();
       if (res.ok) {
         setCartItems(data);
@@ -64,12 +67,15 @@ const Cart = () => {
 
   const removeItem = async (productId) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/cart/${productId}`, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+      const res = await fetch(
+        `http://localhost:5000/api/users/cart/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
         },
-      });
+      );
       const data = await res.json();
       setCartItems(data);
     } catch (error) {
@@ -79,7 +85,7 @@ const Cart = () => {
 
   const subtotal = cartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
-    0
+    0,
   );
   const discount = subtotal * 0.1; // 10% Member Discount
   const shipping = subtotal > 500 ? 0 : 50;
@@ -152,7 +158,7 @@ const Cart = () => {
                       <div className="flex justify-between">
                         <div>
                           <h3 className="text-lg font-medium text-gray-900">
-                            <Link to={`/product/${item.product}`}>
+                            <Link to={`/product/${item.product._id}`}>
                               {item.name}
                             </Link>
                           </h3>
@@ -186,7 +192,7 @@ const Cart = () => {
                             onClick={() =>
                               updateQuantity(
                                 item.product._id,
-                                item.quantity - 1
+                                item.quantity - 1,
                               )
                             }
                             className="px-3 py-1 text-gray-600 hover:bg-gray-100"
@@ -200,7 +206,7 @@ const Cart = () => {
                             onClick={() =>
                               updateQuantity(
                                 item.product._id,
-                                item.quantity + 1
+                                item.quantity + 1,
                               )
                             }
                             className="px-3 py-1 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"

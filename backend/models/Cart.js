@@ -20,8 +20,24 @@ const cartSchema = new mongoose.Schema(
         image: { type: String, required: true },
       },
     ],
+    totalPrice: {
+      type: Number,
+      default: 0,
+    },
+    totalAfterDiscount: {
+      type: Number,
+      default: 0,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+    },
+    appliedCoupon: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Coupon",
+    },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 module.exports = mongoose.model("Cart", cartSchema);

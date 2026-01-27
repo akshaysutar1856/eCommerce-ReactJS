@@ -93,7 +93,14 @@ const CategoryManagement = () => {
             key={cat._id}
             className="bg-white p-4 rounded shadow flex justify-between items-center"
           >
-            <span className="font-medium text-gray-700">{cat.name}</span>
+            <div className="flex items-center space-x-3">
+              <img
+                src={cat.image || "https://via.placeholder.com/40"}
+                alt={cat.name}
+                className="w-10 h-10 rounded-full object-cover border border-gray-200"
+              />
+              <span className="font-medium text-gray-700">{cat.name}</span>
+            </div>
             <div className="space-x-2">
               <button
                 onClick={() => handleEdit(cat)}

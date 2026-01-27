@@ -4,6 +4,7 @@ import AdminLayout from "../../components/AdminLayout";
 const CouponManagement = () => {
   const [coupons, setCoupons] = useState([]);
   const [showModal, setShowModal] = useState(false);
+  const [editCouponId, setEditCouponId] = useState(null);
   const [formData, setFormData] = useState({
     code: "",
     discount: "",
@@ -20,7 +21,7 @@ const CouponManagement = () => {
     try {
       const res = await fetch("http://localhost:5000/api/coupons", {
         headers: {
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
       });
       const data = await res.json();
@@ -36,7 +37,7 @@ const CouponManagement = () => {
         await fetch(`http://localhost:5000/api/coupons/${id}`, {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${userInfo.token}`,
+            Authorization: `Bearer ${userInfo?.token}`,
           },
         });
         fetchCoupons();
@@ -50,19 +51,44 @@ const CouponManagement = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleEdit = (coupon) => {
+    setEditCouponId(coupon._id);
+    setFormData({
+      code: coupon.code,
+      discount: coupon.discount,
+      type: coupon.type,
+      status: coupon.status,
+    });
+    setShowModal(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!userInfo) {
+      alert("You are not authorized.");
+      return;
+    }
+
     try {
-      const res = await fetch("http://localhost:5000/api/coupons", {
-        method: "POST",
+      const url = editCouponId
+        ? `http://localhost:5000/api/coupons/${editCouponId}`
+        : "http://localhost:5000/api/coupons";
+      const method = editCouponId ? "PUT" : "POST";
+
+      const res = await fetch(url, {
+        method: method,
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
+          Authorization: `Bearer ${userInfo?.token}`,
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          discount: Number(formData.discount),
+        }),
       });
       if (res.ok) {
         setShowModal(false);
+        setEditCouponId(null);
         setFormData({
           code: "",
           discount: "",
@@ -70,9 +96,18 @@ const CouponManagement = () => {
           status: "Active",
         });
         fetchCoupons();
+      } else {
+        let errorMessage = "Something went wrong";
+        try {
+          const data = await res.json();
+          errorMessage = data.message || errorMessage;
+        } catch (error) {
+          errorMessage = `Error ${res.status}: ${res.statusText}`;
+        }
+        alert(errorMessage);
       }
     } catch (error) {
-      console.error("Error creating coupon:", error);
+      console.error("Error saving coupon:", error);
     }
   };
 
@@ -83,7 +118,16 @@ const CouponManagement = () => {
           Coupons & Discounts
         </h1>
         <button
-          onClick={() => setShowModal(true)}
+          onClick={() => {
+            setEditCouponId(null);
+            setFormData({
+              code: "",
+              discount: "",
+              type: "Percentage",
+              status: "Active",
+            });
+            setShowModal(true);
+          }}
           className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition-colors"
         >
           + Create Coupon
@@ -125,7 +169,13 @@ const CouponManagement = () => {
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                   {coupon.status}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
+                  <button
+                    onClick={() => handleEdit(coupon)}
+                    className="text-sm bg-indigo-100 text-indigo-700 px-3 py-1 rounded hover:bg-indigo-200"
+                  >
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(coupon._id)}
                     className="text-sm bg-red-100 text-red-700 px-3 py-1 rounded hover:bg-red-200"
@@ -138,12 +188,12 @@ const CouponManagement = () => {
           </tbody>
         </table>
       </div>
-
-      {/* Add Coupon Modal */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
           <div className="bg-white p-8 rounded-lg shadow-xl w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Create New Coupon</h2>
+            <h2 className="text-xl font-bold mb-4">
+              {editCouponId ? "Edit Coupon" : "Create New Coupon"}
+            </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -202,7 +252,10 @@ const CouponManagement = () => {
               <div className="flex justify-end space-x-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setEditCouponId(null);
+                  }}
                   className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
                 >
                   Cancel
@@ -211,7 +264,7 @@ const CouponManagement = () => {
                   type="submit"
                   className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
                 >
-                  Create Coupon
+                  {editCouponId ? "Update Coupon" : "Create Coupon"}
                 </button>
               </div>
             </form>

@@ -18,11 +18,43 @@ const getCoupons = async (req, res) => {
 const createCoupon = async (req, res) => {
   try {
     const { code, discount, type, status } = req.body;
-    const coupon = new Coupon({ code, discount, type, status });
+    const upperCode = code.toUpperCase();
+    const couponExists = await Coupon.findOne({ code: upperCode });
+
+    if (couponExists) {
+      return res.status(400).json({ message: "Coupon already exists" });
+    }
+
+    const coupon = new Coupon({ code: upperCode, discount, type, status });
     const createdCoupon = await coupon.save();
     res.status(201).json(createdCoupon);
   } catch (error) {
     res.status(400).json({ message: error.message });
+  }
+};
+
+// @desc    Update a coupon
+// @route   PUT /api/coupons/:id
+// @access  Private/Admin
+const updateCoupon = async (req, res) => {
+  const { code, discount, type, status } = req.body;
+
+  try {
+    const coupon = await Coupon.findById(req.params.id);
+
+    if (coupon) {
+      coupon.code = code ? code.toUpperCase() : coupon.code;
+      coupon.discount = discount || coupon.discount;
+      coupon.type = type || coupon.type;
+      coupon.status = status || coupon.status;
+
+      const updatedCoupon = await coupon.save();
+      res.json(updatedCoupon);
+    } else {
+      res.status(404).json({ message: "Coupon not found" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -43,4 +75,4 @@ const deleteCoupon = async (req, res) => {
   }
 };
 
-module.exports = { getCoupons, createCoupon, deleteCoupon };
+module.exports = { getCoupons, createCoupon, deleteCoupon, updateCoupon };

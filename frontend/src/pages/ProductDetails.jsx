@@ -6,6 +6,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [qty, setQty] = useState(1);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -22,7 +23,7 @@ const ProductDetails = () => {
     fetchProduct();
   }, [id]);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
       navigate("/login");
@@ -30,7 +31,22 @@ const ProductDetails = () => {
       alert("Admins cannot add items to cart.");
       return;
     } else {
-      alert(`Added ${product.name} to cart!`);
+      try {
+        const res = await fetch("http://localhost:5000/api/users/cart", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+          body: JSON.stringify({ productId: product._id, quantity: qty }),
+        });
+        if (res.ok) {
+          alert(`Added ${product.name} to cart!`);
+          navigate("/cart");
+        }
+      } catch (error) {
+        console.error("Error adding to cart:", error);
+      }
     }
   };
 
@@ -66,6 +82,22 @@ const ProductDetails = () => {
               <p className="text-sm text-gray-500">
                 Stock: {product.countInStock > 0 ? "In Stock" : "Out of Stock"}
               </p>
+              {product.countInStock > 0 && (
+                <div className="flex items-center mt-4">
+                  <span className="mr-3">Quantity</span>
+                  <select
+                    value={qty}
+                    onChange={(e) => setQty(Number(e.target.value))}
+                    className="rounded border appearance-none border-gray-300 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500 text-base pl-3 pr-10"
+                  >
+                    {[...Array(product.countInStock).keys()].map((x) => (
+                      <option key={x + 1} value={x + 1}>
+                        {x + 1}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
             </div>
             <div className="mt-8">
               <button
