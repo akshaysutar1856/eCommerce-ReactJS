@@ -18,14 +18,11 @@ const UserDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       // Fetch User Profile
-      const profileRes = await fetch(
-        "http://localhost:5000/api/users/profile",
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
+      const profileRes = await fetch("http://localhost:5000/api/auth/profile", {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
         },
-      );
+      });
       const profileData = await profileRes.json();
       setUserProfile(profileData);
 

@@ -7,6 +7,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [usePoints, setUsePoints] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!userInfo) {
@@ -31,6 +32,8 @@ const Cart = () => {
       }
     } catch (error) {
       console.error("Error fetching cart:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -102,6 +105,10 @@ const Cart = () => {
       inStock: true,
     },
   ];
+
+  if (loading) {
+    return <div className="text-center py-20 text-xl">Loading cart...</div>;
+  }
 
   if (cartItems.length === 0) {
     return (

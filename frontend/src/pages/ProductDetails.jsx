@@ -7,6 +7,8 @@ const ProductDetails = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [qty, setQty] = useState(1);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -20,11 +22,29 @@ const ProductDetails = () => {
         setLoading(false);
       }
     };
+
+    const checkWishlist = async () => {
+      if (userInfo) {
+        try {
+          const res = await fetch("http://localhost:5000/api/wishlist", {
+            headers: {
+              Authorization: `Bearer ${userInfo.token}`,
+            },
+          });
+          const data = await res.json();
+          const inList = data.products?.some((item) => item._id === id);
+          setIsInWishlist(!!inList);
+        } catch (error) {
+          console.error("Error checking wishlist:", error);
+        }
+      }
+    };
+
     fetchProduct();
+    checkWishlist();
   }, [id]);
 
   const handleAddToCart = async () => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     if (!userInfo) {
       navigate("/login");
     } else if (userInfo.role === "admin") {
@@ -47,6 +67,43 @@ const ProductDetails = () => {
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
+    }
+  };
+
+  const handleToggleWishlist = async () => {
+    if (!userInfo) {
+      navigate("/login");
+      return;
+    }
+
+    try {
+      if (isInWishlist) {
+        const res = await fetch(`http://localhost:5000/api/wishlist/${id}`, {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+        });
+        if (res.ok) {
+          setIsInWishlist(false);
+        }
+      } else {
+        const res = await fetch("http://localhost:5000/api/wishlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${userInfo.token}`,
+          },
+          body: JSON.stringify({ productId: id }),
+        });
+        if (res.ok) {
+          setIsInWishlist(true);
+        } else {
+          alert("Failed to add to wishlist");
+        }
+      }
+    } catch (error) {
+      console.error("Error toggling wishlist:", error);
     }
   };
 
@@ -99,7 +156,7 @@ const ProductDetails = () => {
                 </div>
               )}
             </div>
-            <div className="mt-8">
+            <div className="mt-8 flex space-x-4">
               <button
                 onClick={handleAddToCart}
                 disabled={product.countInStock === 0}
@@ -110,6 +167,31 @@ const ProductDetails = () => {
                 }`}
               >
                 {product.countInStock === 0 ? "Out of Stock" : "Add to Cart"}
+              </button>
+              <button
+                onClick={handleToggleWishlist}
+                className={`p-3 rounded-md border ${
+                  isInWishlist
+                    ? "bg-red-50 border-red-200 text-red-600"
+                    : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
+                }`}
+                title={
+                  isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"
+                }
+              >
+                <svg
+                  className="w-6 h-6"
+                  fill={isInWishlist ? "currentColor" : "none"}
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                  />
+                </svg>
               </button>
             </div>
           </div>

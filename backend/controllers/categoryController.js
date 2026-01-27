@@ -1,6 +1,6 @@
 const Category = require("../models/Category");
 
-// @desc    Fetch all categories
+// @desc    Get all categories
 // @route   GET /api/categories
 // @access  Public
 const getCategories = async (req, res) => {
@@ -18,14 +18,11 @@ const getCategories = async (req, res) => {
 const createCategory = async (req, res) => {
   try {
     const { name, image } = req.body;
-    const categoryExists = await Category.findOne({ name });
-    if (categoryExists) {
-      return res.status(400).json({ message: "Category already exists" });
-    }
-    const category = await Category.create({ name, image });
-    res.status(201).json(category);
+    const category = new Category({ name, image });
+    const createdCategory = await category.save();
+    res.status(201).json(createdCategory);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -34,19 +31,17 @@ const createCategory = async (req, res) => {
 // @access  Private/Admin
 const updateCategory = async (req, res) => {
   try {
-    const { name, image } = req.body;
     const category = await Category.findById(req.params.id);
-
     if (category) {
-      category.name = name || category.name;
-      category.image = image || category.image;
+      category.name = req.body.name || category.name;
+      category.image = req.body.image || category.image;
       const updatedCategory = await category.save();
       res.json(updatedCategory);
     } else {
       res.status(404).json({ message: "Category not found" });
     }
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -57,7 +52,7 @@ const deleteCategory = async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
     if (category) {
-      await Category.deleteOne({ _id: category._id });
+      await category.deleteOne();
       res.json({ message: "Category removed" });
     } else {
       res.status(404).json({ message: "Category not found" });

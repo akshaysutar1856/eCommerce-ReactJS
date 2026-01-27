@@ -16,7 +16,7 @@ const UserWallet = () => {
   const fetchWalletData = async () => {
     try {
       // Fetch Balance (from User Profile)
-      const userRes = await fetch("http://localhost:5000/api/users/profile", {
+      const userRes = await fetch("http://localhost:5000/api/auth/profile", {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },

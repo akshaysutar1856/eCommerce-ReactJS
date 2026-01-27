@@ -1,6 +1,6 @@
 const Address = require("../models/Address");
 
-// @desc    Get all addresses for a user
+// @desc    Get all user addresses
 // @route   GET /api/addresses
 // @access  Private
 const getAddresses = async (req, res) => {
@@ -12,15 +12,12 @@ const getAddresses = async (req, res) => {
   }
 };
 
-// @desc    Create a new address
+// @desc    Add a new address
 // @route   POST /api/addresses
 // @access  Private
 const addAddress = async (req, res) => {
-  const { name, street, city, state, postalCode, country, phone, isDefault } =
-    req.body;
-
   try {
-    if (isDefault) {
+    if (req.body.isDefault) {
       await Address.updateMany(
         { user: req.user._id },
         { $set: { isDefault: false } },
@@ -28,15 +25,8 @@ const addAddress = async (req, res) => {
     }
 
     const address = new Address({
+      ...req.body,
       user: req.user._id,
-      name,
-      street,
-      city,
-      state,
-      postalCode,
-      country,
-      phone,
-      isDefault,
     });
 
     const createdAddress = await address.save();
@@ -50,34 +40,18 @@ const addAddress = async (req, res) => {
 // @route   PUT /api/addresses/:id
 // @access  Private
 const updateAddress = async (req, res) => {
-  const { name, street, city, state, postalCode, country, phone, isDefault } =
-    req.body;
-
   try {
     const address = await Address.findById(req.params.id);
 
     if (address) {
-      if (address.user.toString() !== req.user._id.toString()) {
-        return res.status(401).json({ message: "Not authorized" });
-      }
-
-      if (isDefault) {
+      if (req.body.isDefault) {
         await Address.updateMany(
           { user: req.user._id },
           { $set: { isDefault: false } },
         );
       }
 
-      address.name = name || address.name;
-      address.street = street || address.street;
-      address.city = city || address.city;
-      address.state = state || address.state;
-      address.postalCode = postalCode || address.postalCode;
-      address.country = country || address.country;
-      address.phone = phone || address.phone;
-      address.isDefault =
-        isDefault !== undefined ? isDefault : address.isDefault;
-
+      Object.assign(address, req.body);
       const updatedAddress = await address.save();
       res.json(updatedAddress);
     } else {
@@ -96,10 +70,7 @@ const deleteAddress = async (req, res) => {
     const address = await Address.findById(req.params.id);
 
     if (address) {
-      if (address.user.toString() !== req.user._id.toString()) {
-        return res.status(401).json({ message: "Not authorized" });
-      }
-      await Address.deleteOne({ _id: address._id });
+      await address.deleteOne();
       res.json({ message: "Address removed" });
     } else {
       res.status(404).json({ message: "Address not found" });
@@ -109,4 +80,9 @@ const deleteAddress = async (req, res) => {
   }
 };
 
-module.exports = { getAddresses, addAddress, updateAddress, deleteAddress };
+module.exports = {
+  getAddresses,
+  addAddress,
+  updateAddress,
+  deleteAddress,
+};

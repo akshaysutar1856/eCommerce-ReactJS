@@ -16,7 +16,7 @@ const UserProfile = () => {
       // Fetch latest profile data
       const fetchProfile = async () => {
         try {
-          const res = await fetch("http://localhost:5000/api/users/profile", {
+          const res = await fetch("http://localhost:5000/api/auth/profile", {
             headers: {
               Authorization: `Bearer ${userInfo.token}`,
             },
@@ -47,7 +47,7 @@ const UserProfile = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/users/profile", {
+      const res = await fetch("http://localhost:5000/api/auth/profile", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
