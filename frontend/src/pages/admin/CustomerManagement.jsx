@@ -11,7 +11,7 @@ const CustomerManagement = () => {
 
   const fetchCustomers = async () => {
     try {
-      const res = await fetch("http://localhost:5000/api/users", {
+      const res = await fetch("http://localhost:5000/api/auth/users", {
         headers: {
           Authorization: `Bearer ${userInfo.token}`,
         },
@@ -26,7 +26,7 @@ const CustomerManagement = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this user?")) {
       try {
-        await fetch(`http://localhost:5000/api/users/${id}`, {
+        await fetch(`http://localhost:5000/api/auth/users/${id}`, {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${userInfo.token}`,

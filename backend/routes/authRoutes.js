@@ -4,8 +4,10 @@ const {
   loginUser,
   getUserProfile,
   updateUserProfile,
+  getUsers,
+  deleteUser,
 } = require("../controllers/authController");
-const { protect } = require("../middleware/authMiddleware");
+const { protect, admin } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
@@ -15,5 +17,8 @@ router
   .route("/profile")
   .get(protect, getUserProfile)
   .put(protect, updateUserProfile);
+
+router.route("/users").get(protect, admin, getUsers);
+router.route("/users/:id").delete(protect, admin, deleteUser);
 
 module.exports = router;

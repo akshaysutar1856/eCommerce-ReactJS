@@ -79,12 +79,17 @@ const UserOrders = () => {
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                          order.isDelivered
+                          order.orderStatus === "Delivered" || order.isDelivered
                             ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                            : order.orderStatus === "Out for Delivery"
+                              ? "bg-indigo-100 text-indigo-800"
+                              : order.orderStatus === "Processing"
+                                ? "bg-blue-100 text-blue-800"
+                                : "bg-yellow-100 text-yellow-800"
                         }`}
                       >
-                        {order.isDelivered ? "Delivered" : "Processing"}
+                        {order.orderStatus ||
+                          (order.isDelivered ? "Delivered" : "Pending")}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">

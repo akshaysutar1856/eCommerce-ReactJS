@@ -23,6 +23,7 @@ import ReviewManagement from "../pages/admin/ReviewManagement";
 import Analytics from "../pages/admin/Analytics";
 import Settings from "../pages/admin/Settings";
 import Navbar from "../components/Navbar";
+import OrderDetails from "../pages/OrderDetails";
 
 const ProtectedRoute = ({ children, isAdmin }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -56,6 +57,14 @@ const AppRoutes = () => {
           }
         />
         <Route path="/checkout" element={<Checkout />} />
+        <Route
+          path="/order/:id"
+          element={
+            <ProtectedRoute>
+              <OrderDetails />
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/user/dashboard"
           element={
